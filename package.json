@@ -18,6 +18,10 @@
     "package.json",
     "README.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Maxpsc/babel-plugin-lazy-load"
+  },
   "author": "majiapsc@126.com",
   "license": "ISC",
   "dependencies": {
