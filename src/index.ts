@@ -1,9 +1,6 @@
 import { declare } from '@babel/helper-plugin-utils'
-import type * as BabelCoreNamespace from '@babel/core'
-import type { PluginObj } from '@babel/core'
 import Plugin from './plugin'
-
-type Babel = typeof BabelCoreNamespace & { assertVersion: (range: number) => void }
+import { Babel, PluginObj } from './interface'
 
 type LibraryDirType = string | ((compName: string) => string)
 
@@ -43,21 +40,13 @@ export default declare(function ruiPlugin(babel: Babel): PluginObj {
     visitor: {
       Program: {
         enter(path, state) {
-          console.log(666)
-          // console.log(path.toString())
+          console.log(555)
           globalPlugin = new Plugin(t, state.opts as Options)
           globalPlugin.inspect(path)
         },
-        exit(path) {
+        exit() {
           if (!globalPlugin) return
-          globalPlugin.addReactImport(path)
-          globalPlugin.overwriteComponents(path)
           globalPlugin.resetState()
-
-          console.log('exit end')
-          // console.log(path.toString())
-          // stops traversal entirely.
-          // path.stop()
         },
       },
     },

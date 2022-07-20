@@ -1,31 +1,22 @@
-import type * as BabelCoreNamespace from '@babel/core'
-import type * as BabelTypesNamespace from '@babel/types'
 import template from '@babel/template'
-import uniqBy from 'lodash/uniqBy'
 import { addChunkNameComment, mergeOptions, toKebabCase } from './utils'
-import { reactSpecifiersName, componentTemplate, ruiExtraSpecifier } from './const'
+import { componentTemplate, ruiExtraSpecifier } from './const'
 import { entryVisitor } from './visitor'
 import { Options } from '.'
-
-export type Babel = typeof BabelCoreNamespace
-export type BabelTypes = typeof BabelTypesNamespace
-export type ProgramNodePath = BabelCoreNamespace.NodePath<BabelCoreNamespace.types.Program>
+import { BabelTypes, ProgramNodePath } from './interface'
 
 export interface PluginState {
   /** Whether need transform */
   needTransform: boolean
   /** All react specifiers after merge */
-  reactSpecifier: (
-    | BabelCoreNamespace.types.ImportSpecifier
-    | BabelCoreNamespace.types.ImportDefaultSpecifier
-  )[]
+  reactTransformed: boolean
   /** Components' name ready to split */
   compNames: string[]
 }
 
 const getInitState = (): PluginState => ({
   needTransform: false,
-  reactSpecifier: [],
+  reactTransformed: false,
   compNames: [],
 })
 
@@ -41,6 +32,11 @@ export default class RuiPlugin {
     this.state = getInitState()
     this.types = types
     this.opts = mergeOptions(opts)
+
+    this.getState = this.getState.bind(this)
+    this.updateState = this.updateState.bind(this)
+    this.inspect = this.inspect.bind(this)
+    this.resetState = this.resetState.bind(this)
   }
 
   public getState() {
@@ -65,29 +61,6 @@ export default class RuiPlugin {
   /** First inspect, determine if need transform */
   public inspect(path: ProgramNodePath) {
     path.traverse(entryVisitor, { plugin: this })
-  }
-
-  /** Add all react import in the end */
-  public addReactImport(path: ProgramNodePath) {
-    const t = this.types
-    const { needTransform, reactSpecifier } = this.state
-    if (needTransform) {
-      const defaultSpecifier = t.importDefaultSpecifier(t.identifier('React'))
-
-      const extraSpecifier = reactSpecifiersName.map((n) => {
-        return t.importSpecifier(t.identifier(n), t.identifier(n))
-      })
-
-      const uniqSpecifier = uniqBy(reactSpecifier.concat(extraSpecifier), (i) => {
-        return i.local.name
-      })
-
-      const importDeclaration = t.importDeclaration(
-        [defaultSpecifier, ...uniqSpecifier],
-        t.stringLiteral('react')
-      )
-      path.unshiftContainer('body', importDeclaration)
-    }
   }
 
   /** Overwrite AST related to components */
