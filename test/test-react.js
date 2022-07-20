@@ -1,4 +1,7 @@
-import React, { useEffect, lazy } from 'react'
-import { useContext, xxx as xxx2 } from 'react'
+import React from 'react'
+import { Input } from '@ad/r-ui'
+import { IProps } from './interface'
 
-import { aaa, bbb } from 'demo'
+export default function CrmDataButton(props) {
+  return <Input placeholder="请输入~~~" />
+}

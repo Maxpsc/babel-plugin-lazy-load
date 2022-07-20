@@ -39,10 +39,12 @@ export default declare(function ruiPlugin(babel: Babel): PluginObj {
   let globalPlugin: Plugin = null
 
   return {
-    name: 'rui-lazy-load',
+    name: 'lazy-load',
     visitor: {
       Program: {
         enter(path, state) {
+          console.log(666)
+          // console.log(path.toString())
           globalPlugin = new Plugin(t, state.opts as Options)
           globalPlugin.inspect(path)
         },
@@ -51,8 +53,11 @@ export default declare(function ruiPlugin(babel: Babel): PluginObj {
           globalPlugin.addReactImport(path)
           globalPlugin.overwriteComponents(path)
           globalPlugin.resetState()
+
+          console.log('exit end')
+          // console.log(path.toString())
           // stops traversal entirely.
-          path.stop()
+          // path.stop()
         },
       },
     },

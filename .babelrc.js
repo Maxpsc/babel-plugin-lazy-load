@@ -1,7 +1,7 @@
 module.exports = {
+  presets: ['@babel/preset-react'],
   plugins: [
-    ['./dist/index.js', {
-      libraryName: 'demo',
+    ['./lib/index.js', {
       splitChunkByComp: true,
     }],
   ],

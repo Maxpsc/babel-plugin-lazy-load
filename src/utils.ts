@@ -37,12 +37,12 @@ export function addChunkNameComment<T extends BabelCoreNamespace.types.StringLit
 const defaultOptions: Required<Options> = {
   libraryName,
   libraryDir: {
-    pc: (name) => `lib/components/${name}/pc`,
-    mobile: (name) => `lib/components/${name}/mobile`,
+    pc: (name) => `es/components/${name}/pc`,
+    mobile: (name) => `es/components/${name}/mobile`,
   },
   chunkNames: {
     pc: 'rui-pc',
-    mobile: ' rui-mobile',
+    mobile: 'rui-mobile',
   },
   splitChunkByComp: false,
 }

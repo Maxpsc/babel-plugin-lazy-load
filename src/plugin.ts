@@ -3,11 +3,7 @@ import type * as BabelTypesNamespace from '@babel/types'
 import template from '@babel/template'
 import uniqBy from 'lodash/uniqBy'
 import { addChunkNameComment, mergeOptions, toKebabCase } from './utils'
-
-import {
-  reactSpecifiersName,
-  componentTemplate,
-} from './const'
+import { reactSpecifiersName, componentTemplate, ruiExtraSpecifier } from './const'
 import { entryVisitor } from './visitor'
 import { Options } from '.'
 
@@ -139,6 +135,7 @@ export default class RuiPlugin {
 
             path.insertAfter(
               getAST({
+                USE_MOBILE: t.callExpression(t.identifier(ruiExtraSpecifier), []),
                 COMPONENT_NAME: t.identifier(name),
                 M_COMP_VAR: t.identifier(mName),
                 M_COMP_TAG: t.jsxIdentifier(mName),

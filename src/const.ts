@@ -13,7 +13,7 @@ export const ruiSpecifiersName = [ruiExtraSpecifier, 'message', 'tooltip']
 /** 动态加载组件模板 */
 export const componentTemplate = `
 	const COMPONENT_NAME = (props) => {
-		const isMobile = useMobile()
+		const isMobile = USE_MOBILE
 
 		if (isMobile) {
 			const M_COMP_VAR = lazy(() => M_IMPORT)

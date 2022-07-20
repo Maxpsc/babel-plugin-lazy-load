@@ -66,15 +66,16 @@ export const entryVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
     const {
       opts: { libraryName },
     } = plugin
-		
+    
     if (t.isStringLiteral(path.node.source, { value: libraryName })) {
       if (
         path.node.specifiers
           .filter((i) => t.isImportSpecifier(i))
           .find((i: ImportSpecifier) => !ruiSpecifiersName.includes((i.imported as any).name))
       ) {
+        console.log('lazy-load needTransform:', true)
 				plugin.updateState('needTransform', true)
-        path.stop()
+        // path.stop()
         path
           .findParent((path) => path.isProgram())
           .traverse(innerVisitor, {
