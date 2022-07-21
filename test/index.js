@@ -1,5 +1,10 @@
-import React, { useState } from 'react'
-import { lazy, useEffect } from 'react'
-import { useMobile, message, Button, Input } from '@ad/r-ui'
+import React from 'react'
+import { Button } from '@ad/r-ui'
 
-const app = Button
+export default function App() {
+  return (
+    <div className="app">
+      <Button type="primary">click me</Button>
+    </div>
+  )
+}

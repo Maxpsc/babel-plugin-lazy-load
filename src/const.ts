@@ -1,16 +1,16 @@
-/** 处理的包名 */
+/** target library name */
 export const libraryName = '@ad/r-ui'
 
-/** 额外的react引用 */
+/** react specifier to add */
 export const reactSpecifiersName = ['Suspense', 'lazy']
 
 /** useMobile */
 export const ruiExtraSpecifier = 'useMobile'
 
-/** 非组件用法的引入，不做特殊处理 */
+/** whitelist for component specifiers */
 export const ruiSpecifiersName = [ruiExtraSpecifier, 'message', 'tooltip']
 
-/** 动态加载组件模板 */
+/** dynamic import template */
 export const componentTemplate = `
 	const COMPONENT_NAME = (props) => {
 		const isMobile = USE_MOBILE

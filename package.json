@@ -1,7 +1,7 @@
 {
   "name": "babel-plugin-lazy-load",
   "version": "1.0.0",
-  "description": "Split Component lazy load plugin for babel.",
+  "description": "A Babel plugin to split React component for lazy load",
   "main": "lib/index.js",
   "scripts": {
     "dev": "tsc --watch",
@@ -11,7 +11,8 @@
   },
   "keywords": [
     "babel-plugin",
-    "lazy load"
+    "react lazy",
+    "dynamic import"
   ],
   "files": [
     "lib",

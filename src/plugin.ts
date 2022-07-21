@@ -6,17 +6,16 @@ import { Options } from '.'
 import { BabelTypes, ProgramNodePath } from './interface'
 
 export interface PluginState {
-  /** Whether need transform */
-  needTransform: boolean
   /** All react specifiers after merge */
   reactTransformed: boolean
+  reactSpecifiers: string[]
   /** Components' name ready to split */
   compNames: string[]
 }
 
 const getInitState = (): PluginState => ({
-  needTransform: false,
   reactTransformed: false,
+  reactSpecifiers: [],
   compNames: [],
 })
 
@@ -35,8 +34,9 @@ export default class RuiPlugin {
 
     this.getState = this.getState.bind(this)
     this.updateState = this.updateState.bind(this)
-    this.inspect = this.inspect.bind(this)
+    this.bootstrap = this.bootstrap.bind(this)
     this.resetState = this.resetState.bind(this)
+    this.overwriteComponents = this.overwriteComponents.bind(this)
   }
 
   public getState() {
@@ -58,25 +58,25 @@ export default class RuiPlugin {
     this.state = getInitState()
   }
 
-  /** First inspect, determine if need transform */
-  public inspect(path: ProgramNodePath) {
+  public bootstrap(path: ProgramNodePath) {
     path.traverse(entryVisitor, { plugin: this })
   }
 
-  /** Overwrite AST related to components */
+  /** Overwrite AST related to components by compNames */
   public overwriteComponents(path: ProgramNodePath) {
     const t = this.types
     const { compNames } = this.state
-    const { splitChunkByComp, chunkNames, libraryName, libraryDir: {
-      pc: pcLibraryDir,
-      mobile: mLibraryDir
-    } } = this.opts
+    const {
+      splitChunkByComp,
+      chunkNames,
+      libraryName,
+      libraryDir: { pc: pcLibraryDir, mobile: mLibraryDir },
+    } = this.opts
 
     path.traverse({
       ImportDeclaration(path) {
-        // last import
+        // last importDeclaration
         if (!t.isImportDeclaration(path.getNextSibling())) {
-          //依次追加components
           compNames.forEach((name) => {
             const getAST = template(componentTemplate, {
               plugins: ['jsx'],

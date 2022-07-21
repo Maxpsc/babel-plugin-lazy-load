@@ -31,6 +31,7 @@ export interface Options {
  */
 export default declare(function ruiPlugin(babel: Babel): PluginObj {
   const { types: t, assertVersion } = babel
+  
   assertVersion(7)
 
   let globalPlugin: Plugin = null
@@ -40,18 +41,14 @@ export default declare(function ruiPlugin(babel: Babel): PluginObj {
     visitor: {
       Program: {
         enter(path, state) {
-          console.log(555)
           globalPlugin = new Plugin(t, state.opts as Options)
-          globalPlugin.inspect(path)
+          globalPlugin.bootstrap(path)
         },
         exit() {
           if (!globalPlugin) return
-          globalPlugin.resetState()
+          globalPlugin = null
         },
       },
-    },
-    post() {
-      globalPlugin = null
-    },
+    }
   }
 })
