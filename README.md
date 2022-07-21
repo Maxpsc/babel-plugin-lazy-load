@@ -4,7 +4,7 @@
 
 基于`React.Suspense React.lazy`和`Dynamic Import`，通过此 babel 插件，对开发者无感知的前提下，构建时将组件拆分为对应端的不同 chunk，在运行时判断并懒加载对应端的资源，从而减少首屏文件体积，提高使用者体验。目前设计用于多端组件场景，未来可考虑将转换功能通用化。
 
-转换前
+### 转换前
 
 ```tsx
 import React from 'react'
@@ -19,7 +19,7 @@ export default function App() {
 }
 ```
 
-转换后
+### 转换后
 
 ```tsx
 import React, { Suspense, lazy } from 'react'
@@ -59,8 +59,15 @@ export default function App() {
 }
 ```
 
-使用插件前后构建产物对比
-> 待补充图片
+### 使用插件前后构建产物对比
+
+#### 使用前
+
+<img src="https://github.com/Maxpsc/babel-plugin-lazy-load/raw/main/static/before.png" width="240" alt="使用插件前">
+
+#### 使用后
+
+<img src="https://github.com/Maxpsc/babel-plugin-lazy-load/raw/main/static/after.png" width="600" alt="使用插件后">
 
 
 ## 怎么用
