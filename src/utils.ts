@@ -45,6 +45,7 @@ const defaultOptions: Required<Options> = {
     mobile: 'rui-mobile',
   },
   splitChunkByComp: false,
+  verbose: false,
 }
 
 /** get real options */

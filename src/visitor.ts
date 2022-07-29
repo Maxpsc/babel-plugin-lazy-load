@@ -16,14 +16,15 @@ const innerVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
     if (!plugin) return
 
     const {
-      opts: { libraryName },
+      opts: { libraryName, verbose },
+      log,
       getState,
       updateState,
     } = plugin
 
     // insert extra react Specifiers after last import
     if (!t.isImportDeclaration(path.getNextSibling()) && !getState().reactTransformed) {
-      const extraSpecifiers = difference(reactSpecifiersName, getState().reactSpecifiers)
+      const extraSpecifiers = difference(reactSpecifiersName, getState().reactSpecifiers.map(i => i.importName))
 
       if (extraSpecifiers.length) {
         path.insertAfter(
@@ -40,7 +41,13 @@ const innerVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
 
     // collect react specifiers
     if (t.isStringLiteral(path.node.source, { value: 'react' }) && !getState().reactTransformed) {
-      const specifiers = path.node.specifiers.map((i) => i.local.name)
+      const specifiers = path.node.specifiers.map((i) => {
+        return {
+          importName: (i as any)?.imported?.name,
+          localName: i.local.name,
+        }
+      })
+      
       updateState('reactSpecifiers', (prev) => prev.concat(specifiers))
     }
 
@@ -56,14 +63,55 @@ const innerVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
             )
           }
 
+          const importedName = (path.node.imported as any).name
+          const localName = (path.node.local as any).name
+
           // 支持动态加载的组件，从原来的引用中删除，同时追加组件名
-          if (!ruiSpecifiersName.includes((path.node.imported as any).name)) {
-            plugin.updateState('compNames', (prev) => prev.concat((path.node.imported as any).name))
-            path.remove()
+          if (!ruiSpecifiersName.includes(importedName)) {
+            // assume need add component
+            let needAdd = true
+            path
+              .findParent((p) => t.isProgram(p))
+              .traverse({
+                // = Comp.XX
+                VariableDeclaration(path) {
+                  path.node.declarations.forEach((i) => {
+                    const obj = (i.init as any)?.object || {}
+                    const property = (i.init as any).property
+
+                    if (property && obj.name === localName) {
+                      needAdd = false
+                      path.stop()
+                    }
+                  })
+                },
+                // <Comp.XXX />
+                JSXMemberExpression(path) {
+                  const obj = path.node.object as any
+                  const property = path.node.property as any
+                  if (property && obj.name === localName) {
+                    needAdd = false
+                    path.stop()
+                  }
+                },
+              })
+
+            if (needAdd) {
+              plugin.updateState('compNames', (prev) =>
+                prev.concat({
+                  importName: (path.node.imported as any).name,
+                  localName: path.node.local.name
+                })
+              )
+              path.remove()
+            }
+            
           }
         },
       })
-
+      log('transform components include:', plugin.getState().compNames)
+      
+      // after collecting compNames, begin overwrite
       plugin.overwriteComponents(path.findParent((i) => i.isProgram()) as ProgramNodePath)
     }
   },

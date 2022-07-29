@@ -3,6 +3,7 @@ module.exports = {
   plugins: [
     ['./lib/index.js', {
       splitChunkByComp: true,
+      verbose: true
     }],
   ],
 }

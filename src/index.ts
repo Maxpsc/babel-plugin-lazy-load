@@ -21,6 +21,8 @@ export interface Options {
   }
   /** 组件有各自的chunk，默认false，即合并到两端各自的chunk中 */
   splitChunkByComp?: boolean
+  /** 详细说明，默认false */
+  verbose?: boolean
 }
 
 /**
