@@ -22,33 +22,25 @@ export default function App() {
 ### 转换后
 
 ```tsx
-import React, { Suspense, lazy } from 'react'
+import React, { Suspense, lazy, useState, useEffect, forwardRef } from 'react'
 import { useMobile } from '@ad/r-ui'
 
-const Button = (props: any) => {
-  // 该逻辑用于判断运行设备是否为移动端，双端组件特有
-  const isMobile = useMobile()
+const Button = forwardRef((props, ref) => {
+  const isMobile = useMobile();
+  const [Comp, setComp] = useState<any>(null);
 
-  if (isMobile) {
-    const MButton = lazy(
-      () => import(/* webpackChunkName: 'rui-mobile' */ '@ad/r-ui/es/components/button/mobile')
-    )
-    return (
-      <Suspense fallback={<div>loading~~</div>}>
-        <MButton {...props} />
-      </Suspense>
-    )
-  }
+  useEffect(() => {
+    setComp(
+      lazy(() =>
+        isMobile
+          ? import(/* webpackChunkName: 'rui-mobile' */ '@ad/r-ui/es/components/button/mobile')
+          : import(/* webpackChunkName: 'rui-pc' */ '@ad/r-ui/es/components/button/pc'),
+      ),
+    );
+  }, [isMobile]);
 
-  const PCButton = lazy(
-    () => import(/* webpackChunkName: 'rui-pc' */ '@ad/r-ui/es/components/button/pc')
-  )
-  return (
-    <Suspense fallback={<div>loading~~</div>}>
-      <PCButton {...props} />
-    </Suspense>
-  )
-}
+  return <Suspense fallback={null}>{Comp ? <Comp ref={ref} {...props} /> : null}</Suspense>;
+});
 
 export default function App() {
   return (
@@ -107,6 +99,8 @@ interface Options {
   }
   /** 组件有各自的chunk，默认false，即合并到两端各自的chunk中 */
   splitChunkByComp?: boolean
+  /** 详细说明，默认false */
+  verbose?: boolean
 }
 ```
 
