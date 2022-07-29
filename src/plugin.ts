@@ -84,9 +84,6 @@ export default class RuiPlugin {
               preserveComments: true,
             })
 
-            const mName = `M${name}`
-            const pcName = `PC${name}`
-
             // template不支持innerComment，手动添加ast
             const mLibName =
               typeof mLibraryDir === 'function' ? mLibraryDir(toKebabCase(name)) : mLibraryDir
@@ -110,11 +107,7 @@ export default class RuiPlugin {
               getAST({
                 USE_MOBILE: t.callExpression(t.identifier(ruiExtraSpecifier), []),
                 COMPONENT_NAME: t.identifier(name),
-                M_COMP_VAR: t.identifier(mName),
-                M_COMP_TAG: t.jsxIdentifier(mName),
                 M_IMPORT: mImport,
-                PC_COMP_VAR: t.identifier(pcName),
-                PC_COMP_TAG: t.jsxIdentifier(pcName),
                 PC_IMPORT: pcImport,
               })
             )

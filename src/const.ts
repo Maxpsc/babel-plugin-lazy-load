@@ -2,7 +2,7 @@
 export const libraryName = '@ad/r-ui'
 
 /** react specifier to add */
-export const reactSpecifiersName = ['Suspense', 'lazy']
+export const reactSpecifiersName = ['Suspense', 'lazy', 'forwardRef', 'useState', 'useEffect']
 
 /** useMobile */
 export const ruiExtraSpecifier = 'useMobile'
@@ -12,21 +12,16 @@ export const ruiSpecifiersName = [ruiExtraSpecifier, 'message', 'tooltip']
 
 /** dynamic import template */
 export const componentTemplate = `
-	const COMPONENT_NAME = (props) => {
+	const COMPONENT_NAME = forwardRef((props, ref) => {
 		const isMobile = USE_MOBILE
+		const [Comp, setComp] = useState(null)
 
-		if (isMobile) {
-			const M_COMP_VAR = lazy(() => M_IMPORT)
-			return <Suspense fallback={<div>loading~~</div>}>
-				<M_COMP_TAG {...props} />
-			</Suspense>
-		}
+		useEffect(() => {
+			setComp(lazy(() => isMobile ? M_IMPORT : PC_IMPORT))
+		}, [isMobile])
 
-		const PC_COMP_VAR = lazy(() => PC_IMPORT)
-		return (
-			<Suspense fallback={<div>loading~~</div>}>
-				<PC_COMP_TAG {...props} />
-			</Suspense>
-		)
-	}
+		return <Suspense fallback={null}>
+			{Comp ? <Comp ref={ref} {...props} /> : null}
+		</Suspense>
+	})
 `
