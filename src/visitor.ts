@@ -77,7 +77,7 @@ const innerVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
                 VariableDeclaration(path) {
                   path.node.declarations.forEach((i) => {
                     const obj = (i.init as any)?.object || {}
-                    const property = (i.init as any).property
+                    const property = (i.init as any)?.property
 
                     if (property && obj.name === localName) {
                       needAdd = false
@@ -87,8 +87,8 @@ const innerVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
                 },
                 // <Comp.XXX />
                 JSXMemberExpression(path) {
-                  const obj = path.node.object as any
-                  const property = path.node.property as any
+                  const obj = path.node?.object as any
+                  const property = path.node?.property as any
                   if (property && obj.name === localName) {
                     needAdd = false
                     path.stop()
