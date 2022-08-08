@@ -1,6 +1,8 @@
 import React from 'react'
 import { Button as Zutton, SearchGroup as A, Form, Input } from '@ad/r-ui'
 
+const { Item: FormItem } = Form
+
 export default function App() {
   return (
     <div className="app">
@@ -9,6 +11,9 @@ export default function App() {
         <A.Item></A.Item>
         <A.Item />
       </A>
+      <Form>
+        <FormItem />
+      </Form>
     </div>
   )
 }

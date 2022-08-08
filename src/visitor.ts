@@ -24,7 +24,10 @@ const innerVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
 
     // insert extra react Specifiers after last import
     if (!t.isImportDeclaration(path.getNextSibling()) && !getState().reactTransformed) {
-      const extraSpecifiers = difference(reactSpecifiersName, getState().reactSpecifiers.map(i => i.importName))
+      const extraSpecifiers = difference(
+        reactSpecifiersName,
+        getState().reactSpecifiers.map((i) => i.importName)
+      )
 
       if (extraSpecifiers.length) {
         path.insertAfter(
@@ -47,7 +50,7 @@ const innerVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
           localName: i.local.name,
         }
       })
-      
+
       updateState('reactSpecifiers', (prev) => prev.concat(specifiers))
     }
 
@@ -73,13 +76,17 @@ const innerVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
             path
               .findParent((p) => t.isProgram(p))
               .traverse({
-                // = Comp.XX
                 VariableDeclaration(path) {
                   path.node.declarations.forEach((i) => {
                     const obj = (i.init as any)?.object || {}
                     const property = (i.init as any)?.property
 
-                    if (property && obj.name === localName) {
+                    if (
+                      // = Comp.XX
+                      (property && obj.name === localName) ||
+                      // { xx } = Comp
+                      ((i.init as any)?.name === localName && i.id?.type === 'ObjectPattern')
+                    ) {
                       needAdd = false
                       path.stop()
                     }
@@ -100,17 +107,16 @@ const innerVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
               plugin.updateState('compNames', (prev) =>
                 prev.concat({
                   importName: (path.node.imported as any).name,
-                  localName: path.node.local.name
+                  localName: path.node.local.name,
                 })
               )
               path.remove()
             }
-            
           }
         },
       })
       log('transform components include:', plugin.getState().compNames)
-      
+
       // after collecting compNames, begin overwrite
       plugin.overwriteComponents(path.findParent((i) => i.isProgram()) as ProgramNodePath)
     }
@@ -125,7 +131,7 @@ export const entryVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
     const {
       opts: { libraryName },
     } = plugin
-    
+
     if (t.isStringLiteral(path.node.source, { value: libraryName })) {
       if (
         path.node.specifiers
@@ -137,7 +143,7 @@ export const entryVisitor: BabelCoreNamespace.Visitor<VisitorState> = {
           .traverse(innerVisitor, {
             plugin,
           })
-			}
+      }
     }
   },
 }
